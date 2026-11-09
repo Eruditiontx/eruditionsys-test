@@ -6,7 +6,7 @@ services:
       args:
         - API_PATH=${API_PATH:-/api}
     ports:
-      - '8000:8000'
+      - '${HOST_PORT:-8000}:8000'
     environment:
       - PORT=8000
       - SECRET_KEY=your_secret_key_here
