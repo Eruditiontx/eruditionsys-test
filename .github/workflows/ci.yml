@@ -1,0 +1,43 @@
+name: UnitTCMS CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+jobs:
+  unittcms-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # root
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+    - name: Format check
+      run: npm run format:check
+    - name: ESLint check
+      run: npm run lint
+    - name: Unit tests
+      run: npm run test
+
+    # frontend
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+    - name: Build frontend
+      working-directory: ./frontend
+      run: npm run build
+

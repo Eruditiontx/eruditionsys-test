@@ -1,0 +1,634 @@
+'use client';
+import { useState, useEffect, useContext } from 'react';
+import {
+  Button,
+  Input,
+  Textarea,
+  Select,
+  SelectItem,
+  Tooltip,
+  Divider,
+  Selection,
+  DropdownTrigger,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  addToast,
+  Badge,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@heroui/react';
+import {
+  Save,
+  ArrowLeft,
+  ChevronDown,
+  CopyPlus,
+  CopyMinus,
+  RotateCw,
+  FileDown,
+  FileSpreadsheet,
+  FileCode,
+  FileJson,
+  ChevronRight,
+  Folder,
+  Filter,
+} from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { NodeApi, Tree } from 'react-arborist';
+import {
+  fetchRun,
+  updateRun,
+  updateRunCases,
+  fetchProjectCases,
+  includeExcludeTestCases,
+  changeStatus,
+  exportRun,
+  assignRunCases,
+  fetchProjectMembersForRun,
+} from '../runsControl';
+import { fetchFolders } from '../../folders/foldersControl';
+import RunProgressChart from './RunPregressDonutChart';
+import TestCaseSelector from './TestCaseSelector';
+import AssigneePicker from './AssigneePicker';
+import TestRunFilter from './TestRunFilter';
+import { useRouter } from '@/src/i18n/routing';
+import { testRunStatus } from '@/config/selection';
+import { RunType, RunStatusCountType, RunMessages } from '@/types/run';
+import { CaseType } from '@/types/case';
+import { TreeNodeData } from '@/types/folder';
+import { TokenContext } from '@/utils/TokenProvider';
+import { useFormGuard } from '@/utils/formGuard';
+import { PriorityMessages } from '@/types/priority';
+import { RunStatusMessages, TestRunCaseStatusMessages } from '@/types/status';
+import { TestTypeMessages } from '@/types/testType';
+import { MemberType } from '@/types/user';
+import { logError } from '@/utils/errorHandler';
+import TreeItem from '@/components/TreeItem';
+import { buildFolderTree } from '@/utils/buildFolderTree';
+
+const defaultTestRun = {
+  id: 0,
+  name: '',
+  configurations: 0,
+  description: '',
+  state: 0,
+  projectId: 0,
+  createdAt: '',
+  updatedAt: '',
+};
+
+type Props = {
+  projectId: string;
+  runId: string;
+  messages: RunMessages;
+  runStatusMessages: RunStatusMessages;
+  testRunCaseStatusMessages: TestRunCaseStatusMessages;
+  priorityMessages: PriorityMessages;
+  testTypeMessages: TestTypeMessages;
+  locale: string;
+};
+
+export default function RunEditor({
+  projectId,
+  runId,
+  messages,
+  runStatusMessages,
+  testRunCaseStatusMessages,
+  priorityMessages,
+  testTypeMessages,
+  locale,
+}: Props) {
+  const tokenContext = useContext(TokenContext);
+  const { theme } = useTheme();
+  const [testRun, setTestRun] = useState<RunType>(defaultTestRun);
+  const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
+  const [runStatusCounts, setRunStatusCounts] = useState<RunStatusCountType[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
+  const [selectedFolder, setSelectedFolder] = useState<TreeNodeData | null>(null);
+  const [testCases, setTestCases] = useState<CaseType[]>([]);
+  const [filteredTestCases, setFilteredTestCases] = useState<CaseType[]>([]);
+  const [isNameInvalid] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<number[]>([]);
+  const [tagFilter, setTagFilter] = useState<number[]>([]);
+  const [assigneeFilter, setAssigneeFilter] = useState<string>('');
+  const [members, setMembers] = useState<MemberType[]>([]);
+  const [pendingAssignees, setPendingAssignees] = useState<Map<number, number | null>>(new Map());
+  const router = useRouter();
+  const isManager = tokenContext.isProjectManager(Number(projectId));
+
+  // not show warning when navigating to test case detail page
+  useFormGuard(isDirty, messages.areYouSureLeave, [`/projects/${projectId}/runs/${runId}/cases/\\d+`]);
+
+  const fetchRunAndStatusCount = async () => {
+    const { run, statusCounts } = await fetchRun(tokenContext.token.access_token, Number(runId));
+    setTestRun(run);
+    setRunStatusCounts(statusCounts);
+  };
+
+  const initTestCases = async (search?: string, status?: string[], tag?: string[], assignee?: string) => {
+    const casesData = await fetchProjectCases(
+      tokenContext.token.access_token,
+      Number(projectId),
+      Number(runId),
+      search,
+      status,
+      tag,
+      assignee
+    );
+    casesData.forEach((testCase: CaseType) => {
+      if (testCase.RunCases && testCase.RunCases.length > 0) {
+        testCase.RunCases[0].editState = 'notChanged';
+      }
+    });
+    setTestCases(casesData);
+  };
+
+  const isSignedIn = tokenContext.isSignedIn();
+  useEffect(() => {
+    if (!isSignedIn) return;
+
+    async function fetchDataEffect() {
+      if (!tokenContext.isSignedIn()) {
+        return;
+      }
+
+      try {
+        await fetchRunAndStatusCount();
+        const foldersData = await fetchFolders(tokenContext.token.access_token, Number(projectId));
+        const tree = buildFolderTree(foldersData);
+        setTreeData(tree);
+        setSelectedFolder(foldersData[0]);
+        initTestCases();
+        const membersData = await fetchProjectMembersForRun(tokenContext.token.access_token, projectId);
+        setMembers(membersData || []);
+      } catch (error: unknown) {
+        logError('Error fetching run data', error);
+      }
+    }
+
+    fetchDataEffect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn]);
+
+  useEffect(() => {
+    function onFilter() {
+      if (selectedFolder && selectedFolder.id) {
+        try {
+          const filteredData = testCases.filter((testCase) => testCase.folderId.toString() === selectedFolder.id);
+          setFilteredTestCases(filteredData);
+        } catch (error: unknown) {
+          logError('Error filtering test cases', error);
+        }
+      }
+    }
+
+    onFilter();
+  }, [selectedFolder, testCases]);
+
+  const handleChangeStatus = async (changeCaseId: number, newStatus: number) => {
+    setIsDirty(true);
+    const newTestCases = changeStatus(changeCaseId, newStatus, testCases);
+    setTestCases(newTestCases);
+  };
+
+  const handleIncludeExcludeCase = async (isInclude: boolean, clickedTestCaseId: number) => {
+    setIsDirty(true);
+    const keys = [clickedTestCaseId];
+    const newTestCases = includeExcludeTestCases(isInclude, keys, Number(runId), testCases);
+    setTestCases(newTestCases);
+  };
+
+  const handleBulkIncludeExcludeCases = async (isInclude: boolean) => {
+    setIsDirty(true);
+    let keys: number[] = [];
+    if (selectedKeys === 'all') {
+      keys = filteredTestCases.map((item) => item.id);
+    } else {
+      keys = Array.from(selectedKeys).map(Number);
+    }
+
+    const newTestCases = includeExcludeTestCases(isInclude, keys, Number(runId), testCases);
+    setTestCases(newTestCases);
+    setSelectedKeys(new Set([]));
+  };
+
+  const handleAssignCase = (runCaseId: number, userId: number | null) => {
+    setIsDirty(true);
+    setTestCases((current) =>
+      current.map((tc) => {
+        if (tc.RunCases && tc.RunCases[0]?.id === runCaseId) {
+          return { ...tc, RunCases: [{ ...tc.RunCases[0], assigneeUserId: userId }] };
+        }
+        return tc;
+      })
+    );
+    setPendingAssignees((prev) => new Map(prev).set(runCaseId, userId));
+  };
+
+  const handleBulkAssignCases = (userId: number | null) => {
+    let keys: number[] = [];
+    if (selectedKeys === 'all') {
+      keys = filteredTestCases.map((item) => item.id);
+    } else {
+      keys = Array.from(selectedKeys).map(Number);
+    }
+
+    const runCaseIds = keys
+      .map((caseId) => {
+        const tc = testCases.find((t) => t.id === caseId);
+        return tc?.RunCases?.[0]?.id;
+      })
+      .filter((id): id is number => typeof id === 'number' && id > 0);
+
+    if (runCaseIds.length === 0) return;
+
+    setIsDirty(true);
+    setTestCases((current) =>
+      current.map((tc) => {
+        if (tc.RunCases?.[0] && runCaseIds.includes(tc.RunCases[0].id)) {
+          return { ...tc, RunCases: [{ ...tc.RunCases[0], assigneeUserId: userId }] };
+        }
+        return tc;
+      })
+    );
+    setPendingAssignees((prev) => {
+      const next = new Map(prev);
+      runCaseIds.forEach((id) => next.set(id, userId));
+      return next;
+    });
+    // Defer clearing selection so the picker dropdown finishes closing before unmounting
+    setTimeout(() => setSelectedKeys(new Set([])), 0);
+  };
+
+  const onSave = async () => {
+    setIsUpdating(true);
+    try {
+      await updateRun(tokenContext.token.access_token, testRun);
+      await updateRunCases(tokenContext.token.access_token, Number(runId), testCases);
+
+      if (pendingAssignees.size > 0) {
+        const grouped = new Map<number | null, number[]>();
+        pendingAssignees.forEach((userId, runCaseId) => {
+          const existing = grouped.get(userId) ?? [];
+          grouped.set(userId, [...existing, runCaseId]);
+        });
+        for (const [userId, ids] of Array.from(grouped.entries())) {
+          await assignRunCases(tokenContext.token.access_token, Number(runId), ids, userId);
+        }
+        setPendingAssignees(new Map());
+      }
+
+      await initTestCases();
+
+      addToast({
+        title: 'Success',
+        color: 'success',
+        description: messages.updatedTestRun,
+      });
+      setIsDirty(false);
+    } catch (error) {
+      logError('Error saving run:', error);
+      addToast({
+        title: 'Error',
+        color: 'danger',
+        description: 'Failed to save run. Please try again.',
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // **************************************************************************
+  // Filter
+  // **************************************************************************
+  const [showFilter, setShowFilter] = useState(false);
+  const [activeFilterNum, setActiveFilterNum] = useState(0);
+
+  const onFilterChange = async (search: string, status: number[], tag: number[], assignee?: string) => {
+    if (isDirty) {
+      addToast({
+        title: 'Error',
+        color: 'danger',
+        description: messages.pleaseSave,
+      });
+      return;
+    }
+
+    const resolvedAssignee = assignee === 'me' ? String(tokenContext.token.user?.id ?? '') : (assignee ?? '');
+
+    setSearchFilter(search);
+    setStatusFilter(status);
+    setTagFilter(tag);
+    setAssigneeFilter(assignee ?? '');
+    setActiveFilterNum((search ? 1 : 0) + (status.length > 0 ? 1 : 0) + (tag.length > 0 ? 1 : 0) + (assignee ? 1 : 0));
+    await initTestCases(search, status.map(String), tag.map(String), resolvedAssignee || undefined);
+  };
+
+  return (
+    <>
+      <div className="border-b-1 dark:border-neutral-700 w-full p-3 flex items-center justify-between">
+        <div className="flex items-center">
+          <Tooltip content={messages.backToRuns}>
+            <Button
+              isIconOnly
+              size="sm"
+              className="rounded-full bg-neutral-50 dark:bg-neutral-600"
+              onPress={() => router.push(`/projects/${projectId}/runs`, { locale: locale })}
+            >
+              <ArrowLeft size={16} />
+            </Button>
+          </Tooltip>
+          <h3 className="font-bold ms-2">{testRun.name}</h3>
+        </div>
+        <div className="flex items-center">
+          <Popover placement="bottom" isOpen={showFilter} onOpenChange={(open) => setShowFilter(open)}>
+            <Badge
+              color="danger"
+              content={activeFilterNum}
+              isInvisible={activeFilterNum === 0}
+              shape="circle"
+              placement="top-left"
+            >
+              <PopoverTrigger>
+                <Button
+                  startContent={<Filter size={16} />}
+                  endContent={<ChevronDown size={16} />}
+                  size="sm"
+                  variant="bordered"
+                  className="me-2"
+                >
+                  {messages.filter}
+                </Button>
+              </PopoverTrigger>
+            </Badge>
+            <PopoverContent>
+              <TestRunFilter
+                messages={messages}
+                testRunCaseStatusMessages={testRunCaseStatusMessages}
+                activeSearchFilter={searchFilter}
+                activeStatusFilters={statusFilter}
+                activeTagFilters={tagFilter}
+                activeAssigneeFilter={assigneeFilter}
+                projectId={projectId}
+                members={members}
+                onFilterChange={(newTitleFilter, newStatusFilters, newTagFilters, newAssigneeFilter) => {
+                  setShowFilter(false);
+                  onFilterChange(newTitleFilter, newStatusFilters, newTagFilters, newAssigneeFilter);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button
+                variant="bordered"
+                size="sm"
+                className="me-2"
+                startContent={<FileDown size={16} />}
+                endContent={<ChevronDown size={16} />}
+              >
+                {messages.export}
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu disallowEmptySelection aria-label="Export options">
+              <DropdownItem
+                key="xml"
+                startContent={<FileCode size={16} />}
+                onPress={() => exportRun(tokenContext.token.access_token, Number(testRun.id), 'xml')}
+              >
+                xml
+              </DropdownItem>
+              <DropdownItem
+                key="json"
+                startContent={<FileJson size={16} />}
+                onPress={() => exportRun(tokenContext.token.access_token, Number(testRun.id), 'json')}
+              >
+                json
+              </DropdownItem>
+              <DropdownItem
+                key="csv"
+                startContent={<FileSpreadsheet size={16} />}
+                onPress={() => exportRun(tokenContext.token.access_token, Number(testRun.id), 'csv')}
+              >
+                csv
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Button
+            startContent={
+              <Badge isInvisible={!isDirty} color="danger" size="sm" content="" shape="circle">
+                <Save size={16} />
+              </Badge>
+            }
+            size="sm"
+            isDisabled={!tokenContext.isProjectReporter(Number(projectId))}
+            color="primary"
+            isLoading={isUpdating}
+            onPress={onSave}
+          >
+            {isUpdating ? messages.updating : messages.update}
+          </Button>
+        </div>
+      </div>
+
+      <div className="container mx-auto max-w-5xl pt-6 px-6 flex-grow">
+        <div className="flex">
+          <div>
+            <div className="w-96 h-72">
+              <div className="flex items-center">
+                <h4 className="font-bold">{messages.progress}</h4>
+                <Tooltip content={messages.refresh}>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    className="rounded-full bg-transparent ms-1"
+                    onPress={fetchRunAndStatusCount}
+                  >
+                    <RotateCw size={16} />
+                  </Button>
+                </Tooltip>
+              </div>
+
+              <RunProgressChart
+                statusCounts={runStatusCounts}
+                testRunCaseStatusMessages={testRunCaseStatusMessages}
+                theme={theme}
+              />
+            </div>
+          </div>
+          <div className="flex-grow">
+            <Input
+              size="sm"
+              type="text"
+              variant="bordered"
+              label={messages.title}
+              value={testRun.name}
+              isInvalid={isNameInvalid}
+              errorMessage={isNameInvalid ? messages.pleaseEnter : ''}
+              onChange={(e) => {
+                setTestRun({ ...testRun, name: e.target.value });
+              }}
+              className="mt-3"
+            />
+
+            <Textarea
+              size="sm"
+              variant="bordered"
+              label={messages.description}
+              value={testRun.description}
+              onValueChange={(changeValue) => {
+                setTestRun({ ...testRun, description: changeValue });
+              }}
+              className="mt-3"
+            />
+
+            <div>
+              <Select
+                size="sm"
+                variant="bordered"
+                selectedKeys={[testRunStatus[testRun.state].uid]}
+                onSelectionChange={(newSelection) => {
+                  if (newSelection !== 'all' && newSelection.size !== 0) {
+                    const selectedUid = Array.from(newSelection)[0];
+                    const index = testRunStatus.findIndex((template) => template.uid === selectedUid);
+                    setTestRun({ ...testRun, state: index });
+                  }
+                }}
+                label={messages.status}
+                className="mt-3 max-w-xs"
+              >
+                {testRunStatus.map((status) => (
+                  <SelectItem key={status.uid}>{runStatusMessages[status.uid]}</SelectItem>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        <Divider className="my-6" />
+        <div className="flex items-center justify-between">
+          <h6 className="h-8 font-bold">{messages.selectTestCase}</h6>
+          <div className="flex items-center gap-2">
+            {(selectedKeys === 'all' || selectedKeys.size > 0) && (
+              <>
+                {isManager && (
+                  <AssigneePicker
+                    isAvatarOnly={false}
+                    assigneeUserId={null}
+                    members={members}
+                    isDisabled={false}
+                    unassignedLabel={messages.unassigned}
+                    searchPlaceholder={messages.searchAssignee}
+                    triggerLabel={messages.assignSelected}
+                    onAssign={(userId) => handleBulkAssignCases(userId)}
+                  />
+                )}
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button
+                      size="sm"
+                      isDisabled={!tokenContext.isProjectReporter(Number(projectId))}
+                      color="primary"
+                      endContent={<ChevronDown size={16} />}
+                    >
+                      {messages.testCaseSelection}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="test case select actions">
+                    <DropdownItem
+                      key="include"
+                      startContent={<CopyPlus size={16} />}
+                      onPress={() => handleBulkIncludeExcludeCases(true)}
+                    >
+                      {messages.includeInRun}
+                    </DropdownItem>
+                    <DropdownItem
+                      key="exclude"
+                      startContent={<CopyMinus size={16} />}
+                      onPress={() => handleBulkIncludeExcludeCases(false)}
+                    >
+                      {messages.excludeFromRun}
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-3 flex rounded-small border-2 dark:border-neutral-700 mb-12">
+          <div className="w-3/12 border-r-1 dark:border-neutral-700">
+            <Tree
+              data={treeData}
+              className="w-full"
+              indent={16}
+              rowHeight={42}
+              overscanCount={5}
+              paddingTop={20}
+              paddingBottom={20}
+              padding={20}
+              width="100%"
+              openByDefault={false}
+              disableDrop={true}
+              disableDrag={true}
+            >
+              {({ node, style }: { node: NodeApi<TreeNodeData>; style: React.CSSProperties }) => (
+                <TreeItem
+                  style={style}
+                  isSelected={selectedFolder ? node.data.id === selectedFolder.id : false}
+                  onClick={() => {
+                    setSelectedKeys(new Set([]));
+                    setSelectedFolder(node.data);
+                  }}
+                  toggleButton={
+                    node.data.children && node.data.children.length > 0 ? (
+                      <Button
+                        size="sm"
+                        className="bg-transparent rounded-full h-6 w-6 min-w-4"
+                        isIconOnly
+                        onPress={() => node.toggle()}
+                      >
+                        {node.isOpen ? (
+                          <ChevronDown size={20} color="#F7C24E" />
+                        ) : (
+                          <ChevronRight size={20} color="#F7C24E" />
+                        )}
+                      </Button>
+                    ) : null
+                  }
+                  icon={<Folder size={20} color="#F7C24E" fill="#F7C24E" />}
+                  label={node.data.name}
+                />
+              )}
+            </Tree>
+          </div>
+          <div className="w-9/12 overflow-x-auto">
+            <TestCaseSelector
+              projectId={projectId}
+              runId={runId}
+              locale={locale}
+              cases={filteredTestCases}
+              isDisabled={!tokenContext.isProjectReporter(Number(projectId))}
+              isManager={isManager}
+              members={members}
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              onChangeStatus={handleChangeStatus}
+              onIncludeCase={(includeTestId) => handleIncludeExcludeCase(true, includeTestId)}
+              onExcludeCase={(excludeCaseId) => handleIncludeExcludeCase(false, excludeCaseId)}
+              onAssignCase={handleAssignCase}
+              messages={messages}
+              testRunCaseStatusMessages={testRunCaseStatusMessages}
+              priorityMessages={priorityMessages}
+              testTypeMessages={testTypeMessages}
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
