@@ -26,7 +26,7 @@ Tests:
 - One test by name: `npx vitest run -t "name"` (add a file path to narrow it).
 - Coverage: `npm run coverage`.
 - E2E (non-Docker): `npx playwright install --with-deps`, then `npm run e2e:dev`. This builds and starts both servers via `playwright.dev.config.ts`. For one spec: `npx playwright test e2e/not-demo-mode.spec.ts --config playwright.dev.config.ts`.
-- E2E (Docker): `docker-compose up --build`, then `npm run e2e:docker`. It targets `http://localhost:8000`.
+- E2E (Docker): `docker-compose up --build`, then `npm run e2e:docker`. It targets `http://localhost:${HOST_PORT:-8000}`. If host port 8000 is taken, start the container with `HOST_PORT=8080 FRONTEND_ORIGIN=http://localhost:8080 docker-compose up --build` and run the tests with the same `HOST_PORT`.
 
 Lint and format:
 - `npm run lint` (root ESLint covers the whole repo; `frontend` also runs `next lint`).
@@ -55,7 +55,7 @@ Build:
 
 ## Production and Docker
 
-- The `Dockerfile` builds frontend (standalone output) and backend (`dist/`). `entrypoint.js` is the runtime. It runs `sequelize-cli db:migrate`, seeds when `IS_DEMO=true`, mounts the backend under `API_PATH`, and serves everything else through Next.js. This gives one process and one port (8000).
+- The `Dockerfile` builds frontend (standalone output) and backend (`dist/`). `entrypoint.js` is the runtime. It runs `sequelize-cli db:migrate`, seeds when `IS_DEMO=true`, mounts the backend under `API_PATH`, and serves everything else through Next.js. This gives one process and one port (8000 in the container; the host port is `HOST_PORT` in `docker-compose.yaml`, default 8000). docker-compose 1.29 cannot nest defaults, so `FRONTEND_ORIGIN` does not follow `HOST_PORT` and must be set alongside it.
 - `API_PATH` is a build argument. The Dockerfile rewrites `spec.basePath` in `backend/tsoa.json` with `jq` at build time, so changing it means rebuilding the image.
 - The runtime layout (`backend/node_modules/express` imported from `entrypoint.js`, `backend/config` and `migrations` copied as-is) is what makes the single-process setup work. Check it if you change Docker or the file layout.
 
