@@ -5,7 +5,7 @@ test('If not demo mode, the landing page will not be displayed and will be redir
 }) => {
   const screenshotDir = 'playwright-screenshots/not-demo-redirect';
 
-  await page.goto('http://localhost:8000/');
+  await page.goto('/');
   await expect(page).toHaveURL(/\/projects/);
 
   await page.screenshot({ path: `${screenshotDir}/landing-page-redirect.png`, fullPage: true });

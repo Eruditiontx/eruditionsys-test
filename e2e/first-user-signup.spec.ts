@@ -4,7 +4,7 @@ test('First User signup and create project', async ({ page }) => {
   const screenshotDir = 'playwright-screenshots/first-user-signup';
 
   // Move to Sign up page
-  await page.goto('http://localhost:8000/en/account/signup');
+  await page.goto('/en/account/signup');
 
   // Fill sign up form
   await page.getByRole('textbox', { name: 'Email*' }).fill('user1@example.com');

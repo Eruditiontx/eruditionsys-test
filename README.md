@@ -35,6 +35,14 @@ docker-compose up --build
 
 You can access the app at `http://localhost:8000`
 
+If port 8000 is already in use, choose another host port with `HOST_PORT` and set `FRONTEND_ORIGIN` to match:
+
+```bash
+HOST_PORT=8080 FRONTEND_ORIGIN=http://localhost:8080 docker-compose up --build
+```
+
+Run the Docker E2E tests with the same `HOST_PORT` (for example `HOST_PORT=8080 npm run e2e:docker`).
+
 [Looking for a non-Docker way?](https://kimatata.github.io/unittcms/docs/getstarted/from-source)
 
 ## Why UnitTCMS
