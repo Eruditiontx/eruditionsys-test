@@ -30,6 +30,9 @@ COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
 COPY frontend ./frontend
 
 WORKDIR /app/frontend
+# Sub-path the app is served under (e.g. /test); empty serves it at the root
+ARG BASE_PATH=
+ENV BASE_PATH=$BASE_PATH
 RUN npm run build
 
 # Build backend

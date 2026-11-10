@@ -93,7 +93,7 @@ export default function HeaderNavbarMenu({ messages, locale }: Props) {
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <Link className="flex justify-start items-center gap-1" href="/" locale={locale}>
-            <Image src="/favicon/icon-192.png" width={32} height={32} alt="Logo" />
+            <Image src={`${Config.basePath}/favicon/icon-192.png`} width={32} height={32} alt="Logo" />
             <p className="font-bold text-inherit ms-1">UnitTCMS</p>
           </Link>
         </NavbarBrand>

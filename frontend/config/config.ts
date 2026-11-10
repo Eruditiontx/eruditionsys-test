@@ -3,6 +3,9 @@ const Config = {
     return process.env.NODE_ENV === 'production';
   },
 
+  // sub-path the app is served under ('' when served at the root), see next.config.js
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
+
   get apiServer() {
     const isSSR = typeof window === 'undefined';
 
@@ -18,7 +21,7 @@ const Config = {
       return `http://localhost:${PORT}${apiPath}`;
     }
 
-    return process.env.NEXT_PUBLIC_BACKEND_ORIGIN || '/api';
+    return process.env.NEXT_PUBLIC_BACKEND_ORIGIN || `${Config.basePath}/api`;
   },
 
   // set 'NEXT_PUBLIC_IS_DEMO=true' in frontend/.env

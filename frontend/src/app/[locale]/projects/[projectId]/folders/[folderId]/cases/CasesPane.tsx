@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { addToast } from '@heroui/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import TestCaseTable from './TestCaseTable';
 import CaseDialog from './CaseDialog';
 import CaseMoveDialog from './CaseMoveDialog';
@@ -45,6 +45,7 @@ export default function CasesPane({
 
   const context = useContext(TokenContext);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const updateUrlParams = (updates: { search?: string; priority?: number[]; type?: number[]; tag?: number[] }) => {
@@ -74,7 +75,7 @@ export default function CasesPane({
       currentParams.delete('tag');
     }
 
-    const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+    const newUrl = `${pathname}?${currentParams.toString()}`;
     router.push(newUrl, { scroll: false });
   };
 

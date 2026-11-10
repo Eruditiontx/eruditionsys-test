@@ -57,7 +57,15 @@ async function startServer() {
 
       // Initialize Next.js app
       const dev = !IS_PROD;
-      const nextApp = next({ dev, dir: path.join(__dirname, '.') });
+      // The standalone image has no next.config.js, so hand Next the config
+      // recorded at build time (basePath etc.), like the generated server.js does.
+      const requiredFilesPath = path.join(__dirname, '.next/required-server-files.json');
+      let conf;
+      if (!dev && fs.existsSync(requiredFilesPath)) {
+        conf = JSON.parse(fs.readFileSync(requiredFilesPath, 'utf8')).config;
+        process.env.__NEXT_PRIVATE_STANDALONE_CONFIG = JSON.stringify(conf);
+      }
+      const nextApp = next({ dev, dir: path.join(__dirname, '.'), conf });
       const handle = nextApp.getRequestHandler();
       await nextApp.prepare();
       console.log('nextjs prepared');
