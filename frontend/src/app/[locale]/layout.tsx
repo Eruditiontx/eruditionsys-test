@@ -24,7 +24,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
       apple: `${Config.basePath}/favicon/apple-touch-icon.png`,
     },
     alternates: {
-      canonical: `https://www.unittcms.org/${locale}`,
+      canonical: `https://odoo.eruditionsys.com/test/${locale}`,
     },
     robots: isOfficialDomain ? { index: true, follow: true } : { index: false, follow: true },
   };
