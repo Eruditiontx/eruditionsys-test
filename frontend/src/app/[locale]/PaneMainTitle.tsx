@@ -41,7 +41,7 @@ export default function MainTitle({ locale }: Props) {
           showAnchorIcon
           as={NextUiLink}
           isExternal
-          href="https://kimatata.github.io/unittcms/docs/getstarted/selfhost"
+          href="https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/getstarted/selfhost.md"
           aria-label="docs"
           color="primary"
           variant="bordered"
@@ -55,7 +55,7 @@ export default function MainTitle({ locale }: Props) {
           showAnchorIcon
           as={NextUiLink}
           isExternal
-          href="https://github.com/kimatata/unittcms"
+          href="https://github.com/Eruditiontx/eruditionsys-test"
           aria-label="Github"
           color="primary"
           variant="bordered"

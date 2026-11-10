@@ -61,13 +61,13 @@ export default function HeaderNavbarMenu({ messages, locale }: Props) {
     commonLinks.push(
       {
         uid: 'docs',
-        href: 'https://kimatata.github.io/unittcms/docs/getstarted/selfhost',
+        href: 'https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/getstarted/selfhost.md',
         label: messages.docs,
         isExternal: true,
       },
       {
         uid: 'roadmap',
-        href: 'https://kimatata.github.io/unittcms/docs/roadmap/',
+        href: 'https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/roadmap/index.md',
         label: messages.roadmap,
         isExternal: true,
       }
@@ -130,7 +130,7 @@ export default function HeaderNavbarMenu({ messages, locale }: Props) {
       </NavbarContent>
 
       <NavbarContent className="basis-1 pl-4" justify="end">
-        <NextUiLink isExternal href="https://github.com/kimatata/unittcms" aria-label="Github">
+        <NextUiLink isExternal href="https://github.com/Eruditiontx/eruditionsys-test" aria-label="Github">
           <GithubIcon className="text-default-500" />
         </NextUiLink>
         <ThemeSwitch />
