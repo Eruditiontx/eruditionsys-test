@@ -1,35 +1,35 @@
 <p align="center">
-  <a href="https://www.unittcms.org/en">
-    <img width="20%" src="https://raw.githubusercontent.com/kimatata/unittcms/refs/heads/main/frontend/public/favicon/icon-192.png" alt="EruditionSys TCMS" />
+  <a href="https://odoo.eruditionsys.com/test/en">
+    <img width="20%" src="https://raw.githubusercontent.com/Eruditiontx/eruditionsys-test/refs/heads/main/frontend/public/favicon/icon-192.png" alt="EruditionSys TCMS" />
     <h1 align="center">EruditionSys TCMS</h1>
   </a>
 </p>
 </br>
 <p align="center">
-  <a href="https://github.com/kimatata/unittcms/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/kimatata/unittcms" alt="License">
+  <a href="https://github.com/Eruditiontx/eruditionsys-test/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/Eruditiontx/eruditionsys-test" alt="License">
   </a>
-  <a href="https://github.com/kimatata/unittcms/releases">
-    <img src="https://img.shields.io/github/v/release/kimatata/unittcms" alt="Release">
+  <a href="https://github.com/Eruditiontx/eruditionsys-test/releases">
+    <img src="https://img.shields.io/github/v/release/Eruditiontx/eruditionsys-test" alt="Release">
   </a>
 </p>
 
 EruditionSys TCMS is an open source test case management system. The application is free and designed for self-hosted use. It can be used in environments with strict security requirements. For more information, please visit the demo site and docs.
 
-[🧪Demo](https://www.unittcms.org)
+[🧪Demo](https://odoo.eruditionsys.com/test)
 
-[📘Docs](https://kimatata.github.io/unittcms/docs)
+[📘Docs](https://github.com/Eruditiontx/eruditionsys-test/tree/main/docs/docs)
 
 ## Getting Started
 
 ```bash
-git clone https://github.com/kimatata/unittcms.git
+git clone https://github.com/Eruditiontx/eruditionsys-test.git
 ```
 
 and start containers with the following command.
 
 ```bash
-cd unittcms
+cd eruditionsys-test
 docker-compose up --build
 ```
 
@@ -58,7 +58,7 @@ SECRET_KEY=<output of: openssl rand -hex 32>
 
 The reverse proxy must forward `/test` and `/test/...` to the container without stripping the prefix, and must not redirect `/test` to `/test/`. With OIDC, register the redirect URI as `https://example.com/test/api/users/oidc/callback`.
 
-[Looking for a non-Docker way?](https://kimatata.github.io/unittcms/docs/getstarted/from-source)
+[Looking for a non-Docker way?](https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/getstarted/from-source.md)
 
 ## Why EruditionSys TCMS
 
