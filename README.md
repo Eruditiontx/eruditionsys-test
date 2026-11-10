@@ -56,7 +56,7 @@ FRONTEND_ORIGIN=https://example.com
 SECRET_KEY=<output of: openssl rand -hex 32>
 ```
 
-The reverse proxy must forward `/test` and `/test/...` to the container without stripping the prefix, and must not redirect `/test` to `/test/`. OIDC sign-in is not yet sub-path aware.
+The reverse proxy must forward `/test` and `/test/...` to the container without stripping the prefix, and must not redirect `/test` to `/test/`. With OIDC, register the redirect URI as `https://example.com/test/api/users/oidc/callback`.
 
 [Looking for a non-Docker way?](https://kimatata.github.io/unittcms/docs/getstarted/from-source)
 

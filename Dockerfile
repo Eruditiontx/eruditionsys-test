@@ -60,6 +60,9 @@ ENV NODE_ENV=production
 ENV PORT=8000
 ENV FRONTEND_ORIGIN=http://localhost:8000
 ENV API_PATH=/api
+# Same value as the frontend build; the backend needs it for OIDC redirects
+ARG BASE_PATH=
+ENV BASE_PATH=$BASE_PATH
 ENV DATABASE_PATH=/app/backend/database/database.sqlite
 
 # Create a non-root user
