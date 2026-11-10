@@ -15,7 +15,10 @@ export default function Footer({ locale }: Props) {
       </Link>
       <div>
         <span>Copyright © 2026-present </span>
-        <Link href="https://odoo.eruditionsys.com/test" className={`${NextUiLinkClasses} !text-gray-500 hover:text-gray-700`}>
+        <Link
+          href="https://odoo.eruditionsys.com/test"
+          className={`${NextUiLinkClasses} !text-gray-500 hover:text-gray-700`}
+        >
           EruditionSys TCMS
         </Link>
       </div>
