@@ -18,7 +18,7 @@ EruditionSys TCMS is an open source test case management system. The application
 
 [🧪Demo](https://odoo.eruditionsys.com/test)
 
-[📘Docs](https://github.com/Eruditiontx/eruditionsys-test/tree/main/docs/docs)
+[📘Docs](https://eruditiontx.github.io/eruditionsys-test/docs)
 
 ## Getting Started
 
@@ -58,7 +58,7 @@ SECRET_KEY=<output of: openssl rand -hex 32>
 
 The reverse proxy must forward `/test` and `/test/...` to the container without stripping the prefix, and must not redirect `/test` to `/test/`. With OIDC, register the redirect URI as `https://example.com/test/api/users/oidc/callback`.
 
-[Looking for a non-Docker way?](https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/getstarted/from-source.md)
+[Looking for a non-Docker way?](https://eruditiontx.github.io/eruditionsys-test/docs/getstarted/from-source)
 
 ## Why EruditionSys TCMS
 

@@ -41,7 +41,7 @@ export default function MainTitle({ locale }: Props) {
           showAnchorIcon
           as={NextUiLink}
           isExternal
-          href="https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/getstarted/selfhost.md"
+          href="https://eruditiontx.github.io/eruditionsys-test/docs/getstarted/selfhost"
           aria-label="docs"
           color="primary"
           variant="bordered"

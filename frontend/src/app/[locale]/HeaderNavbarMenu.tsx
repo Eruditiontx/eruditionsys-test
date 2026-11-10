@@ -61,13 +61,13 @@ export default function HeaderNavbarMenu({ messages, locale }: Props) {
     commonLinks.push(
       {
         uid: 'docs',
-        href: 'https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/getstarted/selfhost.md',
+        href: 'https://eruditiontx.github.io/eruditionsys-test/docs/getstarted/selfhost',
         label: messages.docs,
         isExternal: true,
       },
       {
         uid: 'roadmap',
-        href: 'https://github.com/Eruditiontx/eruditionsys-test/blob/main/docs/docs/roadmap/index.md',
+        href: 'https://eruditiontx.github.io/eruditionsys-test/docs/roadmap/',
         label: messages.roadmap,
         isExternal: true,
       }
