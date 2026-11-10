@@ -12,7 +12,7 @@ import Config from '@/config/config';
 export async function generateMetadata({ params: { locale } }: { params: { locale: LocaleCodeType } }) {
   const headersList = headers();
   const host = headersList.get('host');
-  const isOfficialDomain = host === 'unittcms.org' ? true : false;
+  const isOfficialDomain = host === 'unittcms.org' || host === 'odoo.eruditionsys.com';
   const t = await getTranslations({ locale, namespace: 'Header' });
 
   return {
