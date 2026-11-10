@@ -16,7 +16,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   const t = await getTranslations({ locale, namespace: 'Header' });
 
   return {
-    title: `${t('title')} | UnitTCMS`,
+    title: `${t('title')} | EruditionSys TCMS`,
     description: t('description'),
     icons: {
       icon: `${Config.basePath}/favicon/favicon.ico`,

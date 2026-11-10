@@ -18,11 +18,11 @@
         "in": "header"
       }
     },
-    "name": "UnitTCMS API",
+    "name": "EruditionSys TCMS API",
     "description": "Test Case Management System API",
     "version": "1.0.0",
     "contact": {
-      "name": "UnitTCMS"
+      "name": "EruditionSys TCMS"
     }
   },
   "routes": {

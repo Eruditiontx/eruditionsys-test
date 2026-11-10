@@ -16,7 +16,7 @@ export default function Footer({ locale }: Props) {
       <div>
         <span>Copyright © 2026-present </span>
         <Link href="https://unittcms.org" className={`${NextUiLinkClasses} !text-gray-500 hover:text-gray-700`}>
-          UnitTCMS
+          EruditionSys TCMS
         </Link>
       </div>
 

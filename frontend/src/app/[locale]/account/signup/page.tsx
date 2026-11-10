@@ -7,7 +7,7 @@ import { LocaleCodeType } from '@/types/locale';
 export async function generateMetadata({ params: { locale } }: { params: { locale: LocaleCodeType } }) {
   const t = await getTranslations({ locale, namespace: 'Auth' });
   return {
-    title: `${t('signup')} | UnitTCMS`,
+    title: `${t('signup')} | EruditionSys TCMS`,
     robots: { index: false, follow: false },
   };
 }

@@ -19,7 +19,7 @@ export default function MainTitle({ locale }: Props) {
           class: 'lg:text-7xl md:text-7xl sm:text-7xl text-7xl',
         })}
       >
-        UnitTCMS
+        EruditionSys TCMS
       </h1>
       <br />
       <br />
