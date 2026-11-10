@@ -27,6 +27,8 @@ OIDC authentication is configured through environment variables. You need to pro
 All four environment variables must be set for OIDC authentication to be enabled. If any variable is missing, the SSO button will not appear.
 :::
 
+If UnitTCMS is served under a sub-path (built with `BASE_PATH`, for example `/test` with `API_PATH=/test/api`), keep `FRONTEND_ORIGIN` a bare origin without the path. The redirect URI to register with the provider is then `https://my.domain.tld/test/api/users/oidc/callback`.
+
 ## Docker Setup
 
 If you are running UnitTCMS with Docker, add the OIDC environment variables to your `docker-compose.yaml`:

@@ -3,7 +3,7 @@ import { auth } from 'express-openid-connect';
 import jwt from 'jsonwebtoken';
 import { DataTypes } from 'sequelize';
 import defineUser from '../../models/users.js';
-import { API_PATH, FRONTEND_ORIGIN, IS_PROD, PORT, SECRET_KEY } from '../../config/config.js';
+import { API_PATH, FRONTEND_ORIGIN, FRONTEND_URL, IS_PROD, PORT, SECRET_KEY } from '../../config/config.js';
 import { roles } from './authSettings.js';
 
 const router = express.Router();
@@ -11,7 +11,7 @@ const router = express.Router();
 export default function (sequelize) {
   const User = defineUser(sequelize, DataTypes);
 
-  const signInURL = `${FRONTEND_ORIGIN}/account/signin`;
+  const signInURL = `${FRONTEND_URL}/account/signin`;
   const apiOrigin = IS_PROD ? `${FRONTEND_ORIGIN}${API_PATH}` : `http://localhost:${PORT}`;
 
   const isOIDCConfigured =
@@ -40,7 +40,7 @@ export default function (sequelize) {
     routes: {
       login: false, // We'll handle this manually
       callback: '/oidc/callback',
-      postLogoutRedirect: FRONTEND_ORIGIN,
+      postLogoutRedirect: FRONTEND_URL,
     },
   };
 
@@ -105,7 +105,7 @@ export default function (sequelize) {
       };
 
       const tokenParam = encodeURIComponent(JSON.stringify(tokenData));
-      res.redirect(`${FRONTEND_ORIGIN}/account/sso-callback?token=${tokenParam}`);
+      res.redirect(`${FRONTEND_URL}/account/sso-callback?token=${tokenParam}`);
     } catch (error) {
       console.error('OIDC authentication error:', error);
       res.redirect(signInURL);
