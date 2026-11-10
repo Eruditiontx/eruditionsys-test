@@ -12,7 +12,7 @@ export default function Home() {
       <header className={clsx('hero', styles.heroBanner)}>
         <div className="container">
           <Heading as="h1" className="hero__title">
-            UnitTCMS Docs
+            EruditionSys TCMS Docs
           </Heading>
           <p className="hero__subtitle">Open Source Test Case Management System</p>
           <div className={styles.buttons}>

@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # OIDC Authentication
 
-UnitTCMS supports OpenID Connect (OIDC) authentication, allowing users to sign in using their existing identity provider (such as Keycloak, Auth0, Okta, or any OIDC-compliant provider).
+EruditionSys TCMS supports OpenID Connect (OIDC) authentication, allowing users to sign in using their existing identity provider (such as Keycloak, Auth0, Okta, or any OIDC-compliant provider).
 
 ## Overview
 
@@ -21,17 +21,17 @@ OIDC authentication is configured through environment variables. You need to pro
 | `OIDC_ISSUER` | The issuer base URL of your OIDC provider   | `https://your-keycloak.com/realms/your-realm` |
 | `OIDC_CLIENT_ID` | The client ID from your OIDC provider       | `unittcms-client`                             |
 | `OIDC_CLIENT_SECRET` | The client secret from your OIDC provider   | `your-secret-here`                            |
-| `FRONTEND_ORIGIN` | FQDN or IP address where UnitTCMS is hosted | `https://my.domain.tld`                       |
+| `FRONTEND_ORIGIN` | FQDN or IP address where EruditionSys TCMS is hosted | `https://my.domain.tld`                       |
 
 :::info
 All four environment variables must be set for OIDC authentication to be enabled. If any variable is missing, the SSO button will not appear.
 :::
 
-If UnitTCMS is served under a sub-path (built with `BASE_PATH`, for example `/test` with `API_PATH=/test/api`), keep `FRONTEND_ORIGIN` a bare origin without the path. The redirect URI to register with the provider is then `https://my.domain.tld/test/api/users/oidc/callback`.
+If EruditionSys TCMS is served under a sub-path (built with `BASE_PATH`, for example `/test` with `API_PATH=/test/api`), keep `FRONTEND_ORIGIN` a bare origin without the path. The redirect URI to register with the provider is then `https://my.domain.tld/test/api/users/oidc/callback`.
 
 ## Docker Setup
 
-If you are running UnitTCMS with Docker, add the OIDC environment variables to your `docker-compose.yaml`:
+If you are running EruditionSys TCMS with Docker, add the OIDC environment variables to your `docker-compose.yaml`:
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -59,7 +59,7 @@ Make sure to update the `FRONTEND_ORIGIN` to match your deployment URL in produc
 
 ## From Source Setup
 
-If you are running UnitTCMS from source, add the OIDC variables to your backend `.env` file:
+If you are running EruditionSys TCMS from source, add the OIDC variables to your backend `.env` file:
 
 ```.env title="backend/.env"
 FRONTEND_ORIGIN=http://localhost:8000
@@ -74,7 +74,7 @@ OIDC_CLIENT_SECRET=your-client-secret
 
 ## OIDC Provider Setup
 
-You need to configure your OIDC provider to allow authentication from UnitTCMS. The exact steps vary by provider, but here are the general requirements:
+You need to configure your OIDC provider to allow authentication from EruditionSys TCMS. The exact steps vary by provider, but here are the general requirements:
 
 ### Required Configuration
 
@@ -105,7 +105,7 @@ You need to configure your OIDC provider to allow authentication from UnitTCMS. 
 
 1. In your Authentik Admin UI, go to **Applications → Providers** and create a new **OAuth2/OpenID Connect Provider**
 2. Configure the following:
-    - **Name**: `UnitTCMS` (or any descriptive name)
+    - **Name**: `EruditionSys TCMS` (or any descriptive name)
     - **Client type**: `Confidential`
     - **Client ID**: copy or set your own (use as `OIDC_CLIENT_ID`)
     - **Client Secret**: copy the generated secret (use as `OIDC_CLIENT_SECRET`)

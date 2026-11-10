@@ -6,7 +6,7 @@ sidebar_position: 2
 
 ## Database backup
 
-UnitTCMS uses SQLite for data persistence. Therefore, backing up the database is simply backing up the SQLite DB file.
+EruditionSys TCMS uses SQLite for data persistence. Therefore, backing up the database is simply backing up the SQLite DB file.
 
 Please back up the file `backend/database/database.sqlite`.
 

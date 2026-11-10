@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# UnitTCMS
+# EruditionSys TCMS
 
 Open source test case management system designed for self-hosted use
 
-## Why UnitTCMS
+## Why EruditionSys TCMS
 
 No matter the product, it is difficult to manage all testing with automated tests alone. Depending on the environment, Some portion of testing often involves manual test cases. In my team, we have been managing test cases using Excel. While Excel is a highly versatile tool, it is not specifically designed for test case management, which can make it inconvenient in certain scenarios.
 

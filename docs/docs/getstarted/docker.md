@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Running UnitTCMS with Docker
+# Running EruditionSys TCMS with Docker
 
 First, clone the repository.
 

@@ -8,7 +8,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'UnitTCMS',
+  title: 'EruditionSys TCMS',
   // tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
 
@@ -63,16 +63,16 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'UnitTCMS',
+        title: 'EruditionSys TCMS',
         logo: {
-          alt: 'UnitTCMS Logo',
+          alt: 'EruditionSys TCMS Logo',
           src: 'img/icon-192.png',
         },
         items: [{ to: '/docs', label: 'Docs', position: 'left' }],
       },
       footer: {
         style: 'light',
-        copyright: `Copyright © ${new Date().getFullYear()} UnitTCMS. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} EruditionSys TCMS. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,

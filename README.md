@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://www.unittcms.org/en">
-    <img width="20%" src="https://raw.githubusercontent.com/kimatata/unittcms/refs/heads/main/frontend/public/favicon/icon-192.png" alt="UnitTCMS" />
-    <h1 align="center">UnitTCMS</h1>
+    <img width="20%" src="https://raw.githubusercontent.com/kimatata/unittcms/refs/heads/main/frontend/public/favicon/icon-192.png" alt="EruditionSys TCMS" />
+    <h1 align="center">EruditionSys TCMS</h1>
   </a>
 </p>
 </br>
@@ -14,7 +14,7 @@
   </a>
 </p>
 
-UnitTCMS is an open source test case management system. The application is free and designed for self-hosted use. It can be used in environments with strict security requirements. For more information, please visit the demo site and docs.
+EruditionSys TCMS is an open source test case management system. The application is free and designed for self-hosted use. It can be used in environments with strict security requirements. For more information, please visit the demo site and docs.
 
 [🧪Demo](https://www.unittcms.org)
 
@@ -60,7 +60,7 @@ The reverse proxy must forward `/test` and `/test/...` to the container without 
 
 [Looking for a non-Docker way?](https://kimatata.github.io/unittcms/docs/getstarted/from-source)
 
-## Why UnitTCMS
+## Why EruditionSys TCMS
 
 There are many test case management tools available in the market, which can be categorized into proprietary and open-source solutions.
 
@@ -104,7 +104,7 @@ Support team development by adding or removing members from projects. You can as
 
 ## Supported Languages
 
-UnitTCMS currently supports the following languages:
+EruditionSys TCMS currently supports the following languages:
 
 - German (de)
 - English (en)

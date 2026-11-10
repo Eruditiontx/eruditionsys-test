@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Override settings
 
-UnitTCMS will work with the default settings, but you can override them as needed.
+EruditionSys TCMS will work with the default settings, but you can override them as needed.
 
 :::warning[Strongly Recommended]
 
@@ -14,7 +14,7 @@ It is strongly recommended to change `SECRET_KEY` from the default value in prod
 
 ## Docker
 
-If you are self-hosting UnitTCMS with Docker, you can customize the environment using the `environment` section in `docker-compose.yaml`.
+If you are self-hosting EruditionSys TCMS with Docker, you can customize the environment using the `environment` section in `docker-compose.yaml`.
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -40,7 +40,7 @@ volumes:
 
 ## From Source
 
-If you are self-hosting UnitTCMS from source, you can override the environment by placing `.env` files in the appropriate directory.
+If you are self-hosting EruditionSys TCMS from source, you can override the environment by placing `.env` files in the appropriate directory.
 
 ### Setting frontend environment variables
 

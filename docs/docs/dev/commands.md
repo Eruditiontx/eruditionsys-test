@@ -5,7 +5,7 @@ sidebar_position: 2
 # Commands
 
 Following commands are useful for unittcms development.
-(Setting up a server directly from source, please refer to the following link: [Running UnitTCMS from Source](../getstarted/from-source.md))
+(Setting up a server directly from source, please refer to the following link: [Running EruditionSys TCMS from Source](../getstarted/from-source.md))
 
 ## Frontend
 
