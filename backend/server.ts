@@ -23,6 +23,9 @@ app.use(cors(corsOptions));
 // enable json middleware
 app.use(express.json());
 
+// behind a reverse proxy, take the client IP from X-Forwarded-For (used by the rate limiter)
+app.set('trust proxy', 1);
+
 // enable rate limiter
 const limiter = RateLimit({
   windowMs: 60 * 60 * 1000, // 1h

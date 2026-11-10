@@ -43,6 +43,21 @@ HOST_PORT=8080 FRONTEND_ORIGIN=http://localhost:8080 docker-compose up --build
 
 Run the Docker E2E tests with the same `HOST_PORT` (for example `HOST_PORT=8080 npm run e2e:docker`).
 
+The container port is published on `127.0.0.1` only. Set `HOST_BIND=0.0.0.0` to expose it on every interface.
+
+### Serving under a sub-path behind a reverse proxy
+
+To serve the app at `https://example.com/test/` instead of the root, put these in a `.env` file next to `docker-compose.yaml` and rebuild (`BASE_PATH` is fixed at build time):
+
+```bash
+BASE_PATH=/test
+API_PATH=/test/api
+FRONTEND_ORIGIN=https://example.com
+SECRET_KEY=<output of: openssl rand -hex 32>
+```
+
+The reverse proxy must forward `/test` and `/test/...` to the container without stripping the prefix, and must not redirect `/test` to `/test/`. OIDC sign-in is not yet sub-path aware.
+
 [Looking for a non-Docker way?](https://kimatata.github.io/unittcms/docs/getstarted/from-source)
 
 ## Why UnitTCMS

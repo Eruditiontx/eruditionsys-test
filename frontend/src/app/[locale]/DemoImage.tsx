@@ -2,6 +2,7 @@
 import { Image } from '@heroui/react';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import Config from '@/config/config';
 
 type Props = {
   imageName: string;
@@ -20,7 +21,7 @@ export default function DemoImage({ imageName, altText }: Props) {
 
   return (
     <>
-      <Image src={`/top/${currentTheme}/${imageName}.png`} alt={altText} shadow="md" className="max-w-full" />
+      <Image src={`${Config.basePath}/top/${currentTheme}/${imageName}.png`} alt={altText} shadow="md" className="max-w-full" />
     </>
   );
 }

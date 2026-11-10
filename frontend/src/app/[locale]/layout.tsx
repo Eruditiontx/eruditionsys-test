@@ -7,6 +7,7 @@ import Header from './Header';
 import { Providers } from './providers';
 import { LocaleCodeType } from '@/types/locale';
 import { fontSans } from '@/config/fonts';
+import Config from '@/config/config';
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: LocaleCodeType } }) {
   const headersList = headers();
@@ -18,9 +19,9 @@ export async function generateMetadata({ params: { locale } }: { params: { local
     title: `${t('title')} | UnitTCMS`,
     description: t('description'),
     icons: {
-      icon: '/favicon/favicon.ico',
-      shortcut: '/favicon/favicon-16x16.png',
-      apple: '/favicon/apple-touch-icon.png',
+      icon: `${Config.basePath}/favicon/favicon.ico`,
+      shortcut: `${Config.basePath}/favicon/favicon-16x16.png`,
+      apple: `${Config.basePath}/favicon/apple-touch-icon.png`,
     },
     alternates: {
       canonical: `https://www.unittcms.org/${locale}`,

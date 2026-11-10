@@ -55,7 +55,7 @@ Build:
 
 ## Production and Docker
 
-- The `Dockerfile` builds frontend (standalone output) and backend (`dist/`). `entrypoint.js` is the runtime. It runs `sequelize-cli db:migrate`, seeds when `IS_DEMO=true`, mounts the backend under `API_PATH`, and serves everything else through Next.js. This gives one process and one port (8000 in the container; the host port is `HOST_PORT` in `docker-compose.yaml`, default 8000). docker-compose 1.29 cannot nest defaults, so `FRONTEND_ORIGIN` does not follow `HOST_PORT` and must be set alongside it.
+- The `Dockerfile` builds frontend (standalone output) and backend (`dist/`). `entrypoint.js` is the runtime. It runs `sequelize-cli db:migrate`, seeds when `IS_DEMO=true`, mounts the backend under `API_PATH`, and serves everything else through Next.js. This gives one process and one port (8000 in the container; the host port is `HOST_PORT` in `docker-compose.yaml`, default 8000). docker-compose 1.29 cannot nest defaults, so `FRONTEND_ORIGIN` does not follow `HOST_PORT` and must be set alongside it. The port is published on `HOST_BIND` (default `127.0.0.1`). `BASE_PATH` (build arg, e.g. `/test`) sets Next's `basePath` and `Config.basePath`; with it, set `API_PATH=/test/api` too and have the proxy forward the prefix unstripped (see README).
 - `API_PATH` is a build argument. The Dockerfile rewrites `spec.basePath` in `backend/tsoa.json` with `jq` at build time, so changing it means rebuilding the image.
 - The runtime layout (`backend/node_modules/express` imported from `entrypoint.js`, `backend/config` and `migrations` copied as-is) is what makes the single-process setup work. Check it if you change Docker or the file layout.
 
