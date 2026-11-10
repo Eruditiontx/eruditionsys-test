@@ -4,7 +4,7 @@ import { Input, Button, Card, CardHeader, CardBody } from '@heroui/react';
 import { ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { signUp, signIn, signInAsGuest } from './authControl';
 import { isValidEmail, isValidPassword } from './validate';
-import { Link } from '@/src/i18n/routing';
+import { Link, NextUiLinkClasses } from '@/src/i18n/routing';
 import { UserType, AuthMessages } from '@/types/user';
 import { roles } from '@/config/selection';
 import { TokenContext } from '@/utils/TokenProvider';
@@ -224,6 +224,13 @@ export default function AuthPage({ isSignup, messages, locale, ssoEnabled }: Pro
         </CardBody>
       </Card>
       <Footer locale={locale} />
+      {!isSignup && (
+        <div className="fixed bottom-2 right-4">
+          <a href="https://odoo.eruditionsys.com/" className={`${NextUiLinkClasses} text-small`}>
+            Odoo EruditionSys Login
+          </a>
+        </div>
+      )}
     </div>
   );
 }

@@ -94,7 +94,7 @@ export default function HeaderNavbarMenu({ messages, locale }: Props) {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <Link className="flex justify-start items-center gap-1" href="/" locale={locale}>
             <Image src={`${Config.basePath}/favicon/icon-192.png`} width={32} height={32} alt="Logo" />
-            <p className="font-bold text-inherit ms-1">UnitTCMS</p>
+            <p className="font-bold text-inherit ms-1">EruditionSys TCMS</p>
           </Link>
         </NavbarBrand>
         {commonLinks.map((link) =>

@@ -14,7 +14,7 @@ export default function Footer({ locale }: Props) {
         <Image src={`${Config.basePath}/favicon/icon-192.png`} width={32} height={32} alt="Logo" />
       </Link>
       <div>
-        <span>Copyright © 2024-present </span>
+        <span>Copyright © 2026-present </span>
         <Link href="https://unittcms.org" className={`${NextUiLinkClasses} !text-gray-500 hover:text-gray-700`}>
           UnitTCMS
         </Link>
