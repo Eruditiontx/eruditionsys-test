@@ -19,7 +19,7 @@ export default function Home() {
             <Link className="button button--primary button--lg" to="/docs">
               Docs📰
             </Link>
-            <Link className="button button--secondary button--lg" to="https://github.com/kimatata/unittcms">
+            <Link className="button button--secondary button--lg" to="https://github.com/Eruditiontx/eruditionsys-test">
               GitHub
             </Link>
           </div>

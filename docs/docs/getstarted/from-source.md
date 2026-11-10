@@ -17,7 +17,7 @@ To use EruditionSys TCMS, you need to run both frontend server and backend(API) 
 First, clone the repository.
 
 ```bash
-git clone https://github.com/kimatata/unittcms.git
+git clone https://github.com/Eruditiontx/eruditionsys-test.git
 ```
 
 ## Run backend server

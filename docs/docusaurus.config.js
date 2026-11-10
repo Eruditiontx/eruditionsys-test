@@ -13,15 +13,15 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://kimatata.github.io',
+  url: 'https://eruditiontx.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/unittcms/',
+  baseUrl: '/eruditionsys-test/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'kimatata', // Usually your GitHub org/user name.
-  projectName: 'unittcms', // Usually your repo name.
+  organizationName: 'Eruditiontx', // Usually your GitHub org/user name.
+  projectName: 'eruditionsys-test', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

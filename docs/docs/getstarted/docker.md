@@ -7,13 +7,13 @@ sidebar_position: 2
 First, clone the repository.
 
 ```bash
-git clone https://github.com/kimatata/unittcms.git
+git clone https://github.com/Eruditiontx/eruditionsys-test.git
 ```
 
 and start container with the following command.
 
 ```bash
-cd unittcms
+cd eruditionsys-test
 docker-compose up --build
 ```
 
