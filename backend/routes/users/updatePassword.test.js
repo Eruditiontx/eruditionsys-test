@@ -18,6 +18,7 @@ vi.mock('../../middleware/auth.js', () => ({
 // mock defineUser
 const mockUsers = new Map();
 const mockUser = {
+  scope: () => mockUser,
   findByPk: vi.fn((id) => {
     const user = mockUsers.get(id);
     if (!user) return null;

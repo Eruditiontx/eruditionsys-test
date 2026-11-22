@@ -17,6 +17,9 @@ export default function (sequelize) {
   Member.belongsTo(User, { foreignKey: 'userId' });
   Project.belongsTo(User, { foreignKey: 'userId' });
 
+  // Only the public profile of a member is returned.
+  const userAttributes = ['id', 'email', 'username', 'role', 'avatarPath'];
+
   router.get('/', verifySignedIn, verifyProjectVisibleFromProjectId, async (req, res) => {
     const { projectId, includeOwner } = req.query;
 
@@ -30,7 +33,7 @@ export default function (sequelize) {
       if (!wantOwner) {
         const members = await Member.findAll({
           where: { projectId },
-          include: [{ model: User }],
+          include: [{ model: User, attributes: userAttributes }],
         });
         return res.json(members);
       }
@@ -38,10 +41,10 @@ export default function (sequelize) {
       const [members, project] = await Promise.all([
         Member.findAll({
           where: { projectId },
-          include: [{ model: User }],
+          include: [{ model: User, attributes: userAttributes }],
         }),
         Project.findByPk(projectId, {
-          include: [{ model: User }],
+          include: [{ model: User, attributes: userAttributes }],
         }),
       ]);
 

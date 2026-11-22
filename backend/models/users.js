@@ -27,7 +27,17 @@ function defineUser(sequelize, DataTypes) {
         allowNull: true,
       },
     },
-    { underscored: true }
+    {
+      underscored: true,
+      // The password hash is never loaded unless a query asks for it with
+      // User.scope('withPassword'), so it cannot end up in a response by accident.
+      defaultScope: {
+        attributes: { exclude: ['password'] },
+      },
+      scopes: {
+        withPassword: {},
+      },
+    }
   );
 
   User.associate = (models) => {
