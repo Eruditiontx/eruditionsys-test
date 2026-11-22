@@ -4,11 +4,13 @@ import { DataTypes } from 'sequelize';
 import defineCase from '../../models/cases.js';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
+import caseOwnership from '../../middleware/caseOwnership.js';
 
 export default function (sequelize) {
   const { verifySignedIn } = authMiddleware(sequelize);
   const { verifyProjectDeveloperFromProjectId } = editableMiddleware(sequelize);
   const Case = defineCase(sequelize, DataTypes);
+  const { casesBelongToProject, folderBelongsToProject } = caseOwnership(sequelize);
 
   router.put('/move', verifySignedIn, verifyProjectDeveloperFromProjectId, async (req, res) => {
     const { caseIds, targetFolderId } = req.body;
@@ -18,6 +20,15 @@ export default function (sequelize) {
     }
 
     try {
+      // the role was checked on req.query.projectId only; the body must stay inside that project
+      const projectId = req.query.projectId;
+      if (!(await casesBelongToProject(caseIds, projectId))) {
+        return res.status(404).json({ error: 'Some cases not found' });
+      }
+      if (!(await folderBelongsToProject(targetFolderId, projectId))) {
+        return res.status(404).json({ error: 'Target folder not found' });
+      }
+
       const cases = await Case.findAll({ where: { id: caseIds } });
       if (cases.length !== caseIds.length) {
         return res.status(404).json({ error: 'Some cases not found' });
