@@ -75,7 +75,7 @@ export default {
         security,
         operationId: 'updateFolder',
         summary: 'Update a folder',
-        description: access.developer,
+        description: `A folder stays in its project: \`projectId\` must be the current one, and \`parentFolderId\` must be a folder of the same project that is neither the folder itself nor one of its subfolders. ${access.developer}`,
         parameters: [pathParam('folderId')],
         requestBody: jsonBody(
           object({ name: string, detail: nullable(string), projectId: integer, parentFolderId: nullable(integer) }, [
@@ -85,9 +85,16 @@ export default {
         ),
         responses: {
           200: json('The updated folder.', ref('Folder')),
+          400: jsonError(
+            'The folder would move to another project, or into itself or one of its subfolders.',
+            'A folder cannot be moved to another project'
+          ),
           401: unauthorized,
           403: forbidden,
-          404: folderNotFound,
+          404: text(
+            'The folder does not exist, or the parent folder is not in its project.',
+            'Parent folder not found'
+          ),
           500: internalServerError,
         },
       },
@@ -113,7 +120,7 @@ export default {
         security,
         operationId: 'cloneFolder',
         summary: 'Clone a folder into another folder',
-        description: `Copies the folder, its subfolders, and their cases and steps under the target folder. ${access.developer} The role is checked on the project of the source folder.`,
+        description: `Copies the folder, its subfolders, and their cases and steps under the target folder. The target folder must be in the same project as the source. ${access.developer}`,
         parameters: [pathParam('folderId', 'ID of the folder to copy.')],
         requestBody: jsonBody(
           object({ targetFolderId: { ...integer, description: 'ID of the folder that receives the copy.' } }, [
@@ -124,7 +131,10 @@ export default {
           201: message('The folder was cloned.', 'Folder cloned successfully'),
           401: unauthorized,
           403: forbidden,
-          404: text('The source or target folder does not exist.', 'Folder or target folder not found'),
+          404: text(
+            'The source or target folder does not exist, or they are in different projects.',
+            'Folder or target folder not found'
+          ),
           500: internalServerError,
         },
       },

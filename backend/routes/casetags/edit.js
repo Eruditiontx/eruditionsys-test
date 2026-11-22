@@ -3,6 +3,7 @@ const router = express.Router();
 import { DataTypes } from 'sequelize';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
+import caseOwnership from '../../middleware/caseOwnership.js';
 import defineCaseTag from '../../models/caseTags.js';
 import defineCase from '../../models/cases.js';
 import defineTag from '../../models/tags.js';
@@ -13,6 +14,7 @@ export default function (sequelize) {
   const CaseTag = defineCaseTag(sequelize, DataTypes);
   const Case = defineCase(sequelize, DataTypes);
   const Tag = defineTag(sequelize, DataTypes);
+  const { findProjectIdOfCase } = caseOwnership(sequelize);
 
   router.post('/update', verifySignedIn, verifyProjectDeveloperFromCaseId, async (req, res) => {
     const { tagIds } = req.body;
@@ -42,7 +44,9 @@ export default function (sequelize) {
       const tagsToRemove = currentTagIds.filter((id) => !tagIds.includes(id));
 
       if (tagsToAdd.length > 0) {
-        const validTags = await Tag.findAll({ where: { id: tagsToAdd } });
+        // only tags of the project of the case can be attached
+        const projectId = await findProjectIdOfCase(caseId);
+        const validTags = await Tag.findAll({ where: { id: tagsToAdd, projectId } });
         const newLinks = validTags.map((tag) => ({ caseId, tagId: tag.id }));
         await CaseTag.bulkCreate(newLinks);
       }

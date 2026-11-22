@@ -89,7 +89,8 @@ export default function (sequelize) {
       const sourceFolder = await Folder.findByPk(folderId);
       const targetFolder = await Folder.findByPk(targetFolderId);
 
-      if (!sourceFolder || !targetFolder) {
+      // the role was checked on the project of the source folder; the copy must stay in that project
+      if (!sourceFolder || !targetFolder || targetFolder.projectId !== sourceFolder.projectId) {
         return res.status(404).send('Folder or target folder not found');
       }
 

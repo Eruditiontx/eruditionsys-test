@@ -4,15 +4,39 @@ import { DataTypes } from 'sequelize';
 import defineRunCase from '../../models/runCases.js';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
+import caseOwnership from '../../middleware/caseOwnership.js';
 
 export default function (sequelize) {
   const { verifySignedIn } = authMiddleware(sequelize);
   const { verifyProjectReporterFromRunId } = editableMiddleware(sequelize);
   const RunCase = defineRunCase(sequelize, DataTypes);
+  const { findProjectIdOfRun, casesBelongToProject } = caseOwnership(sequelize);
 
   router.post('/update', verifySignedIn, verifyProjectReporterFromRunId, async (req, res) => {
     const runId = req.query.runId;
     const runCases = req.body;
+    if (!Array.isArray(runCases)) {
+      return res.status(400).json({ error: 'runCases[] is required' });
+    }
+
+    // the role was checked on the run; added cases must be in its project and
+    // changed run cases must be part of the run
+    const newCaseIds = runCases.filter((runCase) => runCase.editState === 'new').map((runCase) => runCase.caseId);
+    const projectId = await findProjectIdOfRun(runId);
+    if (!(await casesBelongToProject(newCaseIds, projectId))) {
+      return res.status(404).json({ error: 'Some cases not found' });
+    }
+    const changedIds = [
+      ...new Set(runCases.filter((runCase) => runCase.editState === 'changed').map((runCase) => Number(runCase.id))),
+    ];
+    if (changedIds.some((id) => !Number.isInteger(id))) {
+      return res.status(404).json({ error: 'Some run cases not found' });
+    }
+    const changedCount = await RunCase.count({ where: { id: changedIds, runId } });
+    if (changedCount !== changedIds.length) {
+      return res.status(404).json({ error: 'Some run cases not found' });
+    }
+
     const t = await sequelize.transaction();
 
     const createRunCase = async (runCase) => {
@@ -41,7 +65,7 @@ export default function (sequelize) {
           status: runCase.status,
         },
         {
-          where: { id: runCase.id },
+          where: { id: runCase.id, runId: runId },
           transaction: t,
         }
       );

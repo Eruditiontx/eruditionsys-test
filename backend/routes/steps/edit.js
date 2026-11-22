@@ -15,6 +15,23 @@ export default function (sequelize) {
   router.post('/update', verifySignedIn, verifyProjectDeveloperFromCaseId, async (req, res) => {
     const caseId = req.query.caseId;
     const steps = req.body;
+    if (!Array.isArray(steps)) {
+      return res.status(400).json({ error: 'steps[] is required' });
+    }
+
+    // The role was checked on the case; only its own steps may be changed or deleted.
+    // A change to any other step rejects the request. A delete of any other step is
+    // skipped instead: the editor sends one for a step that was added and removed
+    // again before saving, with an ID that was never stored.
+    const caseSteps = await CaseStep.findAll({ where: { caseId }, attributes: ['stepId'] });
+    const ownStepIds = new Set(caseSteps.map((caseStep) => caseStep.stepId));
+    const touchesOtherCase = steps
+      .filter((step) => step.editState === 'changed')
+      .some((step) => !ownStepIds.has(Number(step.id)));
+    if (touchesOtherCase) {
+      return res.status(404).send('Step not found');
+    }
+
     const t = await sequelize.transaction();
 
     const createStep = async (step) => {
@@ -37,8 +54,11 @@ export default function (sequelize) {
     };
 
     const deleteStep = async (step) => {
+      if (!ownStepIds.has(Number(step.id))) {
+        return null;
+      }
       await CaseStep.destroy({
-        where: { stepId: step.id },
+        where: { stepId: step.id, caseId: caseId },
         transaction: t,
       });
       await Step.destroy({
@@ -49,16 +69,19 @@ export default function (sequelize) {
     };
 
     const updateStep = async (step) => {
-      await Step.update(step, {
-        where: { id: step.id },
-        transaction: t,
-      });
+      await Step.update(
+        { step: step.step, result: step.result },
+        {
+          where: { id: step.id },
+          transaction: t,
+        }
+      );
       await CaseStep.update(
         {
           stepNo: step.caseSteps.stepNo,
         },
         {
-          where: { stepId: step.id },
+          where: { stepId: step.id, caseId: caseId },
           transaction: t,
         }
       );
