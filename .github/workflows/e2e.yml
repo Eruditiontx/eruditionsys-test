@@ -11,7 +11,8 @@ permissions:
 jobs:
   # This job runs the E2E tests using the docker containers defined in the docker-compose file.
   e2e-docker:
-    runs-on: ubuntu-latest
+    # Playwright 1.51 has no browser builds for the newer ubuntu-latest image
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -48,7 +49,8 @@ jobs:
 
   # This job runs the E2E tests by building and running the backend and frontend from source.
   e2e-dev:
-    runs-on: ubuntu-latest
+    # Playwright 1.51 has no browser builds for the newer ubuntu-latest image
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
