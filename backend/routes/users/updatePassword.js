@@ -23,7 +23,7 @@ export default function (sequelize) {
         return res.status(400).send('New password must be at least 8 characters');
       }
 
-      const user = await User.findByPk(userId);
+      const user = await User.scope('withPassword').findByPk(userId);
       if (!user) {
         return res.status(404).send('User not found');
       }

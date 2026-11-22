@@ -13,9 +13,9 @@
     "specVersion": 3,
     "securityDefinitions": {
       "jwt": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "name": "EruditionSys TCMS API",

@@ -1,11 +1,9 @@
-import { Image, Button, Tooltip, Card, CardBody } from '@heroui/react';
+import { Button, Tooltip, Card, CardBody } from '@heroui/react';
 import { Trash, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import { ChangeEvent, DragEvent } from 'react';
 import { isImage } from './isImage';
+import AttachmentThumbnail from './AttachmentThumbnail';
 import { AttachmentType, CaseMessages } from '@/types/case';
-import Config from '@/config/config';
-
-const apiServer = Config.apiServer;
 
 type Props = {
   isDisabled: boolean;
@@ -42,11 +40,7 @@ export default function CaseAttachmentsEditor({
         {images.map((image, index) => (
           <Card key={index} radius="sm" className="mt-2 me-2 max-w-md">
             <CardBody>
-              <Image
-                alt={image.title}
-                src={`${apiServer}/uploads/${image.filename}`}
-                className="object-cover h-40 w-40"
-              />
+              <AttachmentThumbnail attachmentId={image.id} alt={image.title} />
               <div className="flex items-center justify-between">
                 <p>{image.title}</p>
                 <Tooltip content={messages.delete}>

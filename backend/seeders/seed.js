@@ -1,5 +1,6 @@
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+import { getAttachmentsDir } from '../config/storage.js';
 
 export async function up(queryInterface) {
   const hashedPassword = await bcrypt.hash('password', 10);
@@ -565,9 +566,9 @@ export async function up(queryInterface) {
     },
   ]);
 
-  // copy sample files to uploads folder
+  // copy sample files to attachments folder
   const sampleFolderPath = 'public/sample';
-  const uploadsFolderPath = 'public/uploads';
+  const uploadsFolderPath = getAttachmentsDir();
   const SeleniumLogoFileName = '861px-Selenium_Logo.png';
   const vitestLogoFileName = 'logo-shadow.svg';
   if (!fs.existsSync(uploadsFolderPath)) {

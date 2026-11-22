@@ -13,7 +13,7 @@ export default function (sequelize) {
   router.post('/signin', async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({
+      const user = await User.scope('withPassword').findOne({
         where: {
           email: email,
         },

@@ -17,6 +17,7 @@ services:
     volumes:
       - db-data:/app/backend/database
       - ./backend/public/uploads:/app/backend/public/uploads
+      - ./backend/storage/attachments:/app/backend/storage/attachments
 
 volumes:
   db-data:

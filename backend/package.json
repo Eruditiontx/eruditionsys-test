@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file-if-exists=.env dist/index.js",
-    "dev": "tsoa spec-and-routes && concurrently \"nodemon --config nodemon-tsoa.json\" \"nodemon index.ts\"",
-    "build": "tsoa spec-and-routes && tsc && mkdir -p dist/public && cp public/swagger.json dist/public/",
+    "spec": "tsoa spec-and-routes && node scripts/mergeOpenapi.js",
+    "dev": "npm run spec && concurrently \"nodemon --config nodemon-tsoa.json\" \"nodemon index.ts\"",
+    "build": "npm run spec && tsc && mkdir -p dist/public && cp public/swagger.json dist/public/",
     "migrate": "sequelize db:migrate",
     "seed": "sequelize db:seed:all",
     "drop": "sequelize db:migrate:undo:all"
