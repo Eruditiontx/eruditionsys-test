@@ -1,6 +1,6 @@
 {
-  "watch": ["controllers/**/*.ts"],
+  "watch": ["controllers/**/*.ts", "openapi/**/*.js", "scripts/mergeOpenapi.js"],
   "ignore": ["dist", "node_modules"],
-  "exec": "tsoa spec-and-routes",
-  "ext": "ts"
+  "exec": "npm run spec",
+  "ext": "ts,js"
 }
