@@ -27,7 +27,6 @@ const runId = pathParam('runId');
 const runIdQuery = queryParam('runId');
 const runNotFound = text('The run does not exist.', 'failed to find projectId');
 const missingProjectId = jsonError('`projectId` is missing.', 'projectId is required');
-const missingRunId = jsonError('`runId` is missing.', 'runId is required');
 const runProperties = {
   name: string,
   configurations: nullable(string),
@@ -217,7 +216,7 @@ export default {
         security,
         operationId: 'updateRunCases',
         summary: 'Add cases to a run, remove them, and record results',
-        description: `\`editState\` says what to do with each entry: \`new\` adds the case to the run, \`deleted\` removes it, \`changed\` stores the status. All changes are applied in one transaction. ${access.reporter}`,
+        description: `\`editState\` says what to do with each entry: \`new\` adds the case to the run, \`deleted\` removes it, \`changed\` stores the status. All changes are applied in one transaction. Added cases must belong to the project of the run, and changed run cases must be part of the run. ${access.reporter}`,
         parameters: [runIdQuery],
         requestBody: jsonBody(arrayOf(runCaseEdit)),
         responses: {
@@ -225,10 +224,14 @@ export default {
             'The remaining entries: added run cases as stored, the others as they were sent.',
             arrayOf({ type: 'object', additionalProperties: true })
           ),
-          400: missingRunId,
+          400: jsonError('`runId` is missing, or the body is not an array.', 'runId is required'),
           401: unauthorized,
           403: forbidden,
-          404: runNotFound,
+          404: mixedError(
+            'The run does not exist, an added case is not in its project, or a changed run case is not part of it.',
+            'Some cases not found',
+            'failed to find projectId'
+          ),
           500: internalServerError,
         },
       },

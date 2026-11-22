@@ -132,7 +132,7 @@ export default {
         security,
         operationId: 'setCaseTags',
         summary: 'Set the tags of a case',
-        description: `Replaces the tags of the case with the given list: missing tags are attached and the others are detached. Unknown tag IDs are ignored. ${access.developer}`,
+        description: `Replaces the tags of the case with the given list: missing tags are attached and the others are detached. Unknown tag IDs, and tags of another project, are ignored. ${access.developer}`,
         parameters: [queryParam('caseId')],
         requestBody: jsonBody(object({ tagIds: { ...arrayOf(integer), maxItems: 5 } }, ['tagIds'])),
         responses: {
