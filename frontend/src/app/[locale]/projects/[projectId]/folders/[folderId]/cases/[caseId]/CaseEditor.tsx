@@ -163,7 +163,7 @@ export default function CaseEditor({
   };
 
   const handleFetchCreateAttachments = async (caseId: number, files: File[]) => {
-    const newAttachments = await fetchCreateAttachments(caseId, files);
+    const newAttachments = await fetchCreateAttachments(tokenContext.token.access_token, caseId, files);
 
     if (newAttachments) {
       const newAttachmentsWithJoinTable = [];
@@ -189,7 +189,7 @@ export default function CaseEditor({
   };
 
   const onAttachmentDelete = async (attachmentId: number) => {
-    await fetchDeleteAttachment(attachmentId);
+    await fetchDeleteAttachment(tokenContext.token.access_token, attachmentId);
     if (testCase.Attachments) {
       const filteredAttachments = testCase.Attachments.filter((attachment) => attachment.id !== attachmentId);
 
@@ -473,7 +473,7 @@ export default function CaseEditor({
             isDisabled={!tokenContext.isProjectDeveloper(Number(projectId))}
             attachments={testCase.Attachments}
             onAttachmentDownload={(attachmentId: number, downloadFileName: string) =>
-              fetchDownloadAttachment(attachmentId, downloadFileName)
+              fetchDownloadAttachment(tokenContext.token.access_token, attachmentId, downloadFileName)
             }
             onAttachmentDelete={onAttachmentDelete}
             onFilesDrop={handleDrop}

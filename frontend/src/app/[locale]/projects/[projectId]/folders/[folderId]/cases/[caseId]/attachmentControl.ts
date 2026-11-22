@@ -2,23 +2,25 @@ import Config from '@/config/config';
 import { logError } from '@/utils/errorHandler';
 const apiServer = Config.apiServer;
 
-async function fetchDownloadAttachment(attachmentId: number, downloadFileName: string) {
+async function fetchAttachmentBlob(jwt: string, attachmentId: number) {
   const fetchOptions = {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${jwt}`,
     },
   };
 
   const url = `${apiServer}/attachments/download/${attachmentId}`;
+  const response = await fetch(url, fetchOptions);
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return await response.blob();
+}
 
+async function fetchDownloadAttachment(jwt: string, attachmentId: number, downloadFileName: string) {
   try {
-    const response = await fetch(url, fetchOptions);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const blob = await response.blob();
+    const blob = await fetchAttachmentBlob(jwt, attachmentId);
     const downloadUrl = window.URL.createObjectURL(blob);
 
     const link = document.createElement('a');
@@ -27,13 +29,14 @@ async function fetchDownloadAttachment(attachmentId: number, downloadFileName: s
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
   } catch (error: unknown) {
     logError('Error downloading attachment', error);
     throw error;
   }
 }
 
-async function fetchCreateAttachments(caseId: number, files: File[]) {
+async function fetchCreateAttachments(jwt: string, caseId: number, files: File[]) {
   try {
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
@@ -43,6 +46,9 @@ async function fetchCreateAttachments(caseId: number, files: File[]) {
     const url = `${apiServer}/attachments?parentCaseId=${caseId}`;
     const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
       body: formData,
     });
 
@@ -57,11 +63,12 @@ async function fetchCreateAttachments(caseId: number, files: File[]) {
   }
 }
 
-async function fetchDeleteAttachment(attachmentId: number) {
+async function fetchDeleteAttachment(jwt: string, attachmentId: number) {
   const fetchOptions = {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${jwt}`,
     },
   };
 
@@ -78,4 +85,4 @@ async function fetchDeleteAttachment(attachmentId: number) {
   }
 }
 
-export { fetchDownloadAttachment, fetchCreateAttachments, fetchDeleteAttachment };
+export { fetchAttachmentBlob, fetchDownloadAttachment, fetchCreateAttachments, fetchDeleteAttachment };

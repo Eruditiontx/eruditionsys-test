@@ -1,21 +1,23 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import multer from 'multer';
 import express from 'express';
 const router = express.Router();
 import { DataTypes } from 'sequelize';
 import defineAttachment from '../../models/attachments.js';
 import defineCaseAttachment from '../../models/caseAttachments.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import authMiddleware from '../../middleware/auth.js';
+import attachmentMiddleware from '../../middleware/verifyAttachment.js';
+import { getAttachmentsDir } from '../../config/storage.js';
 
 export default function (sequelize) {
   const Attachment = defineAttachment(sequelize, DataTypes);
   const CaseAttachment = defineCaseAttachment(sequelize, DataTypes);
+  const { verifySignedIn } = authMiddleware(sequelize);
+  const { verifyProjectDeveloperFromParentCaseId } = attachmentMiddleware(sequelize);
 
-  // Create uploads folder if it does not exist
-  const uploadDir = path.join(__dirname, '../../public/uploads');
+  // Create attachments folder if it does not exist
+  const uploadDir = getAttachmentsDir();
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
@@ -50,7 +52,9 @@ export default function (sequelize) {
   const upload = multer({ storage });
 
   // TODO middleware to verify user permission to upload files
-  router.post('/', upload.array('files', 10), async (req, res) => {
+  // The permission checks run before multer, so a rejected request never writes a file.
+  const uploadFiles = upload.array('files', 10);
+  router.post('/', verifySignedIn, verifyProjectDeveloperFromParentCaseId, uploadFiles, async (req, res) => {
     const t = await sequelize.transaction();
     try {
       const caseId = req.query.parentCaseId;

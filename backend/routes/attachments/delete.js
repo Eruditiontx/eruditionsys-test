@@ -1,18 +1,19 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import express from 'express';
 const router = express.Router();
 import { DataTypes } from 'sequelize';
 import defineAttachment from '../../models/attachments.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import authMiddleware from '../../middleware/auth.js';
+import attachmentMiddleware from '../../middleware/verifyAttachment.js';
+import { getAttachmentsDir } from '../../config/storage.js';
 
 export default function (sequelize) {
   const Attachment = defineAttachment(sequelize, DataTypes);
+  const { verifySignedIn } = authMiddleware(sequelize);
+  const { verifyProjectDeveloperFromAttachmentId } = attachmentMiddleware(sequelize);
 
-  // TODO middleware to verify user permission to delete attachment
-  router.delete('/:attachmentId', async (req, res) => {
+  router.delete('/:attachmentId', verifySignedIn, verifyProjectDeveloperFromAttachmentId, async (req, res) => {
     const attachmentId = req.params.attachmentId;
     const t = await sequelize.transaction();
 
@@ -23,20 +24,17 @@ export default function (sequelize) {
         return res.status(404).send('Attachment not found');
       }
 
-      // delete file from folder
-      const uploadDir = path.join(__dirname, '../../public/uploads');
-      const filePath = path.join(uploadDir, attachment.filename);
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error('Error deleting file:', err);
-          t.rollback();
-          return res.status(404).send('Attachment not found');
-        }
-      });
-
       await attachment.destroy({ transaction: t });
       await t.commit();
-      res.status(204).send();
+
+      // The record is gone; a file that is already missing is not an error.
+      const filePath = path.join(getAttachmentsDir(), path.basename(attachment.filename));
+      try {
+        await fs.promises.rm(filePath, { force: true });
+      } catch (error) {
+        console.error('Error deleting file:', error);
+      }
+      return res.status(204).send();
     } catch (error) {
       console.error(error);
       await t.rollback();

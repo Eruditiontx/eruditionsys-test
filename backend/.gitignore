@@ -2,6 +2,7 @@ node_modules/
 .env
 public/uploads/*
 !public/uploads/dummy.txt
+storage/
 
 # TypeScript
 dist/

@@ -1,18 +1,20 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import express from 'express';
 const router = express.Router();
 import { DataTypes } from 'sequelize';
 import defineAttachment from '../../models/attachments.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import authMiddleware from '../../middleware/auth.js';
+import attachmentMiddleware from '../../middleware/verifyAttachment.js';
+import { getAttachmentsDir } from '../../config/storage.js';
 
 export default function (sequelize) {
   const Attachment = defineAttachment(sequelize, DataTypes);
+  const { verifySignedIn } = authMiddleware(sequelize);
+  const { verifyProjectVisibleFromAttachmentId } = attachmentMiddleware(sequelize);
 
   // TODO middleware to verify user permission to get attachment
-  router.get('/download/:attachmentId', async (req, res) => {
+  router.get('/download/:attachmentId', verifySignedIn, verifyProjectVisibleFromAttachmentId, async (req, res) => {
     const attachmentId = req.params.attachmentId;
 
     try {
@@ -21,7 +23,7 @@ export default function (sequelize) {
         return res.status(404).send('Attachment not found');
       }
 
-      const filePath = path.join(__dirname, `../../public/uploads/${attachment.filename}`);
+      const filePath = path.join(getAttachmentsDir(), path.basename(attachment.filename));
 
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'File not found' });
