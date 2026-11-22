@@ -6,6 +6,7 @@ import defineStep from '../../models/steps.js';
 import defineCaseStep from '../../models/caseSteps.js';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
+import caseOwnership from '../../middleware/caseOwnership.js';
 
 export default function (sequelize) {
   const { verifySignedIn } = authMiddleware(sequelize);
@@ -13,6 +14,7 @@ export default function (sequelize) {
   const Case = defineCase(sequelize, DataTypes);
   const Step = defineStep(sequelize, DataTypes);
   const CaseStep = defineCaseStep(sequelize, DataTypes);
+  const { casesBelongToProject, folderBelongsToProject } = caseOwnership(sequelize);
   Case.belongsToMany(Step, { through: 'caseSteps' });
   Step.belongsToMany(Case, { through: 'caseSteps' });
 
@@ -25,6 +27,15 @@ export default function (sequelize) {
     }
 
     try {
+      // the role was checked on req.query.projectId only; the body must stay inside that project
+      const projectId = req.query.projectId;
+      if (!(await casesBelongToProject(caseIds, projectId))) {
+        return res.status(404).json({ error: 'Some cases not found' });
+      }
+      if (!(await folderBelongsToProject(targetFolderId, projectId))) {
+        return res.status(404).json({ error: 'Target folder not found' });
+      }
+
       const caseRecords = await Case.findAll({
         where: { id: caseIds },
         include: [{ model: Step, through: { attributes: ['stepNo'] } }],

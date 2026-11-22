@@ -61,12 +61,21 @@ const assigneeFilter = queryParam('assigneeUserId', {
   description: 'Only run cases assigned to this user. Send the text `null` for unassigned ones.',
 });
 const folderId = queryParam('folderId');
-const projectId = queryParam('projectId', { description: 'ID of the project the permission is checked on.' });
+const projectId = queryParam('projectId', {
+  description: 'ID of the project. Every case, and the target folder, must belong to it.',
+});
 const caseIdsBody = (properties, required) =>
   jsonBody(object({ caseIds: { ...arrayOf(integer), minItems: 1 }, ...properties }, ['caseIds', ...required]));
 const folderNotFound = text('The folder does not exist.', 'failed to find projectId');
 const caseNotFound = text('The case does not exist.', 'failed to find projectId');
-const someCasesNotFound = jsonError('At least one of the cases does not exist.', 'Some cases not found');
+const someCasesNotFound = jsonError(
+  'At least one of the cases does not exist in this project.',
+  'Some cases not found'
+);
+const casesOrFolderNotFound = jsonError(
+  'At least one of the cases, or the target folder, does not exist in this project.',
+  'Some cases not found'
+);
 const attachmentNotFound = text('The attachment does not exist.', 'Attachment not found');
 
 const stepEdit = object(
@@ -249,7 +258,7 @@ export default {
           ),
           401: unauthorized,
           403: forbidden,
-          404: someCasesNotFound,
+          404: casesOrFolderNotFound,
           500: internalServerError,
         },
       },
@@ -271,7 +280,7 @@ export default {
           ),
           401: unauthorized,
           403: forbidden,
-          404: someCasesNotFound,
+          404: casesOrFolderNotFound,
           500: internalServerError,
         },
       },
@@ -282,7 +291,7 @@ export default {
         security,
         operationId: 'deleteCases',
         summary: 'Delete cases',
-        description: `IDs that do not exist are ignored. ${access.developer}`,
+        description: `Nothing is deleted unless every case belongs to the project. ${access.developer}`,
         parameters: [projectId],
         requestBody: jsonBody(object({ caseIds: arrayOf(integer) }, ['caseIds'])),
         responses: {
@@ -290,6 +299,7 @@ export default {
           400: mixedError('`projectId` or `caseIds` is missing.', 'projectId is required', 'Invalid caseIds array'),
           401: unauthorized,
           403: forbidden,
+          404: someCasesNotFound,
           500: internalServerError,
         },
       },
